@@ -1,0 +1,14 @@
+# 敏感配置文件（含API Key）
+config.json
+# 对话记忆文件（用户隐私）
+memory.json
+# 日志文件（可能含敏感记录）
+agent.log
+# Python缓存文件（无用，不上传）
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+# 系统临时文件
+.DS_Store
+*.swp
