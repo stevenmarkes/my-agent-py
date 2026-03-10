@@ -1,61 +1,82 @@
-# AI Agent 智能体
-基于 Python + 智谱GLM API 实现的工程化AI智能体，集成多工具调用、对话记忆持久化、完善的日志系统和异常处理，兼顾功能性与工程化规范，适配各种需求。
+# 🤖 RAG 智能助手
+基于智谱 GLM + LangChain + FAISS 构建的本地私有化 RAG 智能助手，集成多工具能力、对话记忆持久化、完善的日志/异常处理，附带 Streamlit 可视化 Web 界面，适配面试演示与实际场景使用。
 
-## 🚀 技术栈
-- 核心语言：Python 3.8+
-- 大模型：智谱GLM API（chatglm_std）
-- 工程化：日志系统、配置管理、异常处理、文件持久化
-- 工具链：文件读写、Python代码运行、对话上下文管理
+## ✨ 核心亮点
+1. **工程化规范**：完善的日志系统、异常捕获、敏感信息保护（`.gitignore` 规范）
+2. **多工具集成**：支持 PDF 问答（RAG）、文件生成/读取、Python 脚本运行
+3. **私有化部署**：本地运行，数据不泄露，支持离线 PDF 检索
+4. **双端交互**：终端命令行版 + Streamlit Web 可视化版，适配不同演示场景
+5. **持久化能力**：对话记忆自动保存，重启后不丢失
 
-## ✨ 核心特性
-### 1. 工程化设计
-- 📊 双端日志：终端实时输出 + 文件日志（agent.log），方便问题排查与行为追溯
-- 🔒 配置隔离：敏感信息（API Key）通过 config.json 管理，避免硬编码泄露
-- ⚠️ 分类异常处理：针对网络、API认证、工具调用等场景做专属异常捕获，程序鲁棒性强
+## 🛠️ 技术栈
+| 技术/库                | 用途                          |
+|-------------------------|-------------------------------|
+| LangChain/LangChain-Classic | 构建 RAG 流程、工具调用链    |
+| FAISS                   | 本地向量存储，PDF 文本检索    |
+| 智谱 GLM API            | 大语言模型推理                |
+| Streamlit               | Web 可视化界面开发            |
+| Python Logging          | 日志记录与问题排查            |
+| JSON 持久化             | 对话记忆、配置文件管理        |
 
-### 2. 多工具集成
-- 📝 文件生成：支持将AI生成的代码/文本保存为指定文件（如 qarobot.py）
-- 📖 文件读取：安全读取本地文件内容（限制显示前500字，避免输出过载）
-- ▶️ 代码运行：执行本地Python文件，含10秒超时保护，避免死循环阻塞
-
-### 3. 对话记忆持久化
-- 历史对话自动保存到 memory.json，重启程序不丢失上下文
-- 记忆格式兼容智谱GLM API规范，无缝衔接大模型调用
-
-## 📦 快速开始（一键运行）
-### 1. 克隆仓库
-git clone https://github.com/stevenmarkes/my-agent-py.git
-cd my-agent-py
-
-### 2. 安装依赖
-pip install zhipuai requests
-
-### 3. 配置 API Key
-1. 复制仓库中的 config.example.json 文件，并重命名为 config.json；
-2. 在 config.json 中填写你的智谱 GLM API Key：
-{"zhipu_api_key": "你的智谱API Key"}
-
-### 4. 启动智能体
+## 🚀 快速开始
+### 1. 环境依赖安装
+```bash
+# 安装核心依赖
+pip install langchain-community langchain-classic faiss-cpu zhipuai streamlit
+2. 配置智谱 API Key
+复制示例配置文件：cp config.example.json config.json（Windows 用 copy config.example.json config.json）
+打开 config.json，填入你的智谱 API Key（从 智谱开放平台 获取）：
+json
+{
+  "zhipu_api_key": "你的智谱API Key"
+}
+3. 运行方式
+方式 1：终端交互版（轻量演示）
+bash
+运行
 python my_agent.py
+方式 2：Web 可视化版（直观演示）
+bash
+运行
+streamlit run agent_web.py
+# 运行后自动打开浏览器，地址：http://localhost:8501
+📌 功能演示示例
+1. PDF 问答（核心 RAG 能力）
+plaintext
+# 终端版输入
+你：基于test.pdf回答文档里的核心内容有哪些？
+Agent（RAG回答）：文档核心包含...（精准检索PDF内容，无幻觉）
+2. 多工具调用
+plaintext
+# 文件生成
+你：帮我写一个简单的Python加法脚本，保存为add.py
+Agent：✅ 已保存文件：add.py
 
-## 📋 功能演示（示例指令）
-运行后输入以下指令即可体验对应功能：
-- 指令：帮我写一个本地问答机器人，保存为 qarobot.py → 功能：调用文件生成工具，自动创建 qarobot.py
-- 指令：查看 qarobot.py → 功能：调用文件读取工具，返回文件前 500 字内容
-- 指令：运行 qarobot.py → 功能：调用代码运行工具，执行文件并返回结果
-- 指令：退出 → 功能：保存对话记忆并安全退出程序
+# 运行脚本
+你：运行add.py
+Agent：✅ 运行add.py成功：
+1 + 2 = 3
 
-## 📂 项目目录结构
-my-agent-py/
-├── my_agent.py          # 主程序（核心逻辑）
-├── config.example.json  # 配置示例文件（可上传）
-├── config.json          # 敏感配置（.gitignore忽略，不上传）
-├── .gitignore           # Git忽略规则（保护敏感文件）
-├── memory.json          # 对话记忆（.gitignore忽略）
-├── agent.log            # 日志文件（.gitignore忽略）
+# 读取文件
+你：查看add.py
+Agent：✅ 读取add.py成功（前500字）：
+def add(a, b):
+    return a + b
+
+if __name__ == "__main__":
+    print(1 + 2)
+📁 项目结构
+plaintext
+├── my_agent.py          # 核心终端版代码（RAG+多工具+日志+持久化）
+├── agent_web.py         # Streamlit Web可视化版代码
+├── config.example.json  # API Key配置示例（无敏感信息，可公开）
+├── config.json          # 本地配置文件（含真实API Key，不上传Git）
+├── test.pdf             # 测试用PDF文件（用于RAG演示）
+├── .gitignore           # Git忽略配置（保护敏感/缓存文件）
 └── README.md            # 项目说明文档
-
-## 🛡️ 安全与规范
-- 所有敏感文件（config.json、memory.json、agent.log）均通过 .gitignore 排除，避免 API Key 等隐私信息泄露；
-- 代码运行工具添加超时保护（10 秒），避免恶意/错误代码导致程序阻塞；
-- 文件读写做权限异常捕获，提升程序容错性。
+🎯 核心特性详解
+RAG 精准问答：基于 FAISS 向量检索，解决大模型幻觉问题，仅检索 PDF 内相关内容回答
+异常处理：覆盖网络异常、API Key 错误、文件不存在等场景，保证程序鲁棒性
+日志系统：详细记录操作日志、错误信息，便于问题排查与演示时的流程追溯
+敏感信息保护：通过 .gitignore 排除 config.json，仅上传示例文件，避免 API Key 泄露
+对话记忆持久化：自动保存对话记录到 memory.json，重启程序后可继续交互
